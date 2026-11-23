@@ -46,7 +46,7 @@ beginPage('Zimmer auf dem Dach',$error);
 <label>E-Mail-Adresse oder Telefonnummer<input name="contact" maxlength="254" required value="<?=e(field('contact'))?>"></label>
 <label class="trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
 <label><input type="checkbox" name="wait" value="1" <?=field('wait')?'checked':''?>> Ich möchte mit meiner Spende warten, bis sie steuerlich absetzbar ist. Bitte gebt mir dann persönlich Bescheid.</label>
-<p><small>Eine Zusage zählt 28 Tage. Wenn du auf die Spendenabsetzbarkeit wartest, bleibt sie ohne Frist offen. Die Schule verwendet deine Kontaktdaten für Rückfragen zu deiner Zusage. Öffentlich erscheint nur die Summe.</small></p>
+<p><small>Die Schule verwendet deine Kontaktdaten für Rückfragen zu deiner Zusage. Öffentlich erscheint nur die Summe.</small></p>
 <div class="actions"><button>Spende zusagen</button><button type="button" class="secondary" id="close-pledge">Schließen</button></div></form></dialog>
 <section><h2>Vom Flachdach zum Zimmer - Blogartikel</h2><div class="reports">
 <?php foreach ([
