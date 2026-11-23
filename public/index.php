@@ -72,7 +72,7 @@ beginPage('Zimmer auf dem Dach',$error);
     </div>
     <div class="share-qr">
       <img src="/assets/spendenseite-qr.svg" width="160" height="160" alt="QR-Code zur Spendenseite">
-      <p>QR-Code für deine Präsentation</p>
+      <p>QR Code</p>
       <a href="/assets/spendenseite-qr.svg" download>SVG herunterladen</a> · <a href="/assets/spendenseite-qr.png" download>PNG herunterladen</a>
     </div>
   </div>
