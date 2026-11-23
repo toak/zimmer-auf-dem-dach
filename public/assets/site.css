@@ -62,3 +62,7 @@ html[data-text-size="1"]{font-size:112.5%}html[data-text-size="2"]{font-size:125
 .share-qr p { margin: 0 0 .4rem; }
 @media (max-width: 680px) { .share-layout { grid-template-columns: 1fr; } }
 @media (max-width: 680px) { .share-qr img { display: none; } }
+
+.otp-fields { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(4px, 1vw, 10px); margin: 12px 0 20px; }
+.otp-fields input { min-width: 0; padding: 8px 0; height: 3rem; text-align: center; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.otp-fields input:focus-visible { outline: 2px solid #183e70; outline-offset: 1px; }

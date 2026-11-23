@@ -28,9 +28,16 @@ if (!$admin): ?>
 <h1>Verwaltung</h1>
 <?php if(isset($_SESSION['pending'])): ?><article><h2>Anmeldung bestätigen</h2><form method="post"><?=formFields('login')?><button>Jetzt anmelden</button></form></article>
 <?php else: ?><article><h2>Mit E-Mail anmelden</h2><p>Gib deine freigeschaltete Adresse ein. Du erhältst einen sechsstelligen Code und einen Anmeldelink. Wähle einen der beiden Wege.</p><form method="post"><?=formFields('request')?><label>E-Mail-Adresse<input type="email" name="email" autocomplete="email" required value="<?=e($_SESSION['login_email']??'')?>"></label><button>Code und Link anfordern</button></form></article>
-<details class="code-box" <?=isset($_SESSION['login_email']) || field('action')==='code'?'open':''?>><summary>Einmalcode eingeben</summary><form method="post"><?=formFields('code')?>
-<label>E-Mail-Adresse<input type="email" name="email" autocomplete="email" required value="<?=e($_SESSION['login_email']??field('email'))?>"></label>
-<label>Sechsstelliger Code<input name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required></label><button>Anmelden</button></form></details><?php endif ?>
+<p><a id="open-code" href="?einmalcode=1">Einmalcode eingeben</a></p>
+<dialog id="login-code" aria-labelledby="code-title" <?=isset($_SESSION['login_email']) || isset($_GET['einmalcode']) || field('action')==='code'?'open':''?>>
+<h2 id="code-title">Einmalcode eingeben</h2>
+<?php if ($error && field('action')==='code'): ?><p class="notice error" role="alert"><?=e($error)?></p><?php endif ?>
+<form method="post" action="/admin/"><?=formFields('code')?>
+<label>E-Mail-Adresse<input type="email" name="email" autocomplete="email" required value="<?=e(field('action')==='code'?field('email'):($_SESSION['login_email']??''))?>"></label>
+<p id="code-help">Gib den sechsstelligen Code aus deiner E-Mail ein.</p>
+<div id="code-fields"><input aria-label="Sechsstelliger Code" aria-describedby="code-help" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required></div>
+<div class="actions"><button>Anmelden</button><button id="close-code" class="secondary" type="button" hidden>Schließen</button></div>
+</form></dialog><script src="/assets/admin.js" defer></script><?php endif ?>
 <?php else:
 $state=query('SELECT * FROM campaign WHERE id=1')->fetch(); ?>
 <div class="admin-heading">
