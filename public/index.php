@@ -43,14 +43,16 @@ beginPage('Zimmer auf dem Dach',$error,$embedded);
 <p>Gemeinsam schaffen wir einen Ort, an dem Kinder lernen, glauben und wachsen können.</p>
 <p><strong>Deine Spende macht den Unterschied!</strong></p></div><img src="/assets/dachzimmer-planung.jpg" alt="3D-Ansicht des geplanten Dachzimmers mit Fensterfront und Gruppentischen"></section>
 <article><small>Unser Spendenziel · <?=eur($goal)?></small>
-<h2><?=eur($received + $sum)?> inklusive Zusagen</h2>
-<svg width="100%" height="18" viewBox="0 0 <?=$goal?> 18" preserveAspectRatio="none" role="img" aria-label="<?=eur($received)?> eingegangen und <?=eur($sum)?> zugesagt bei einem Ziel von <?=eur($goal)?>">
+<h2><?=eur($received + $sum)?><?=$sum > 0 ? ' inklusive Zusagen' : ''?></h2>
+<svg width="100%" height="18" viewBox="0 0 <?=$goal?> 18" preserveAspectRatio="none" role="img" aria-label="<?=eur($received)?> eingegangen<?php if ($sum > 0): ?> und <?=eur($sum)?> zugesagt<?php endif ?> bei einem Ziel von <?=eur($goal)?>">
   <rect width="<?=$goal?>" height="18" fill="#e9edf1"/>
   <rect width="<?=$receivedWidth?>" height="18" fill="#183e70"/>
   <rect x="<?=$receivedWidth?>" width="<?=$pledgedWidth?>" height="18" fill="#e7ab24"/>
 </svg>
+<?php if ($sum > 0): ?>
 <p class="stat"><svg width="12" height="12" aria-hidden="true"><rect width="12" height="12" fill="#183e70"/></svg> <?=eur($received)?> eingegangen ·
 <svg width="12" height="12" aria-hidden="true"><rect width="12" height="12" fill="#e7ab24"/></svg> <?=eur($sum)?> zugesagt</p>
+<?php endif ?>
 <?php if ($stand['as_of']): ?><p><small>Kontostand vom <?=dateAT($stand['as_of'])?></small></p><?php endif ?>
 <p><strong>Spenden bald steuerlich absetzbar!</strong> Mit einer Zusage wird dein Beitrag gleich hier angezeigt.</p>
 <div class="actions"><a <?=$embedded?'target="_blank" rel="noopener"':'id="open-pledge"'?> class="button" href="/?zusage=1#pledge">Spende zusagen</a><a class="button secondary" href="#konto">Jetzt überweisen</a></div></article>
