@@ -101,6 +101,15 @@ function handleAdmin(string $action): string {
     $id=field('id');
     $row=query('SELECT cents,received_at FROM pledges WHERE id=?',[$id])->fetch();
     if (!$row) throw new FormError('Zusage nicht gefunden.');
+    if ($action==='delete_pledge') {
+        if ($row['received_at']===null) {
+            query('DELETE FROM pledges WHERE id=?', [$id]);
+        } else {
+            // Keep an anonymous receipt for balance reconciliation and history.
+            query("UPDATE pledges SET donor='',contact='',created_at=received_at,wait_tax=0,reminded_at=NULL WHERE id=?", [$id]);
+        }
+        return 'Die Zusage wurde gelöscht.';
+    }
     if ($row['received_at']!==null) return 'Diese Zusage ist bereits verbucht.';
     if ($action==='remind') {
         query('UPDATE pledges SET reminded_at=? WHERE id=?',[time(),$id]);

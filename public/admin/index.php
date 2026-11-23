@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         if ($action==='login') redeemLink();
         if ($action==='code') redeemCode();
         if ($action==='logout') { $_SESSION=[]; session_destroy(); redirect('/admin/'); }
-        $target=match($action){'receive','remind'=>'zusagen','add','revoke'=>'zugriff',default=>'spenden'};
+        $target=match($action){'receive','remind','delete_pledge'=>'zusagen','add','revoke'=>'zugriff',default=>'spenden'};
         redirect('/admin/#'.$target,transaction(fn()=>handleAdmin($action)));
     } catch(FormError $ex) { $error=$ex->getMessage(); if (field('action')==='login') unset($_SESSION['pending']); }
 }
@@ -56,7 +56,7 @@ $state=query('SELECT * FROM campaign WHERE id=1')->fetch(); ?>
 <div class="filters"><label>Suche<input id="term" type="search" placeholder="Name oder Kontakt"></label><label>Status<select id="status"><option value="">Alle Zusagen</option><option>Offen</option><option>Wartet auf Absetzbarkeit</option><option>Abgelaufen</option><option>Eingegangen</option></select></label><label>Erinnerung<select id="reminder"><option value="">Alle</option><option value="0">Noch nicht erinnert</option><option value="1">Bereits erinnert</option></select></label></div>
 <p id="matches" aria-live="polite"></p>
 <table class="pledges"><thead><tr><th>Person</th><th>Betrag</th><th>Status</th><th>Zusage erhalten</th><th>Letzte Erinnerung</th><th>Zahlung eingegangen</th><th>Aktionen</th></tr></thead><tbody id="records">
-<?php $count=0; foreach(query('SELECT * FROM pledges ORDER BY CASE WHEN received_at IS NULL THEN 0 ELSE 1 END, created_at DESC,id') as $p): $count++; $received=$p['received_at']!==null; ?>
+<?php $count=0; foreach(query("SELECT * FROM pledges WHERE donor <> '' ORDER BY CASE WHEN received_at IS NULL THEN 0 ELSE 1 END, created_at DESC,id") as $p): $count++; $received=$p['received_at']!==null; ?>
 <?php
 $status=$received?'Eingegangen':($p['wait_tax']?'Wartet auf Absetzbarkeit':(((int)$p['created_at']+28*86400<=time())?'Abgelaufen':'Offen'));
 $stamp=static fn($ts)=>$ts?date('d.m.Y · H:i',(int)$ts):'—';
@@ -68,7 +68,12 @@ $stamp=static fn($ts)=>$ts?date('d.m.Y · H:i',(int)$ts):'—';
 <td data-label="Zusage erhalten"><?=$stamp($p['created_at'])?></td>
 <td data-label="Letzte Erinnerung"><?=$stamp($p['reminded_at'])?></td>
 <td data-label="Zahlung eingegangen"><?=$stamp($p['received_at'])?></td><td data-label="Aktionen">
-<?php if(!$received): ?><form method="post" action="/admin/#zusagen"><?=csrf()?><input type="hidden" name="id" value="<?=e($p['id'])?>"><button class="secondary" name="action" value="remind">Erinnert</button><button name="action" value="receive">Eingegangen</button></form><?php endif ?></td></tr>
+<?php if(!$received): ?><form method="post" action="/admin/#zusagen"><?=csrf()?><input type="hidden" name="id" value="<?=e($p['id'])?>"><button class="secondary" name="action" value="remind">Erinnert</button><button name="action" value="receive">Eingegangen</button></form><?php endif ?>
+<details class="delete-pledge">
+  <summary aria-label="Zusage von <?=e($p['donor'])?> löschen" title="Zusage löschen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></svg></summary>
+  <p>Zusage von <?=e($p['donor'])?> über <?=eur((int)$p['cents'])?> löschen?<?php if ($received): ?> Der Zahlungseingang bleibt verbucht.<?php endif ?></p>
+  <form method="post" action="/admin/#zusagen"><?=formFields('delete_pledge')?><input type="hidden" name="id" value="<?=e($p['id'])?>"><button>Endgültig löschen</button></form>
+</details></td></tr>
 <?php endforeach ?></tbody></table></article>
 <article id="zugriff"><h2>Benutzerverwaltung</h2><?php foreach(query('SELECT email FROM admins ORDER BY email') as $u): ?><div class="row"><?=e($u['email'])?>
 <?php if ($u['email']!==$admin['email']): ?><form method="post"><?=formFields('revoke')?><input type="hidden" name="email" value="<?=e($u['email'])?>"><button class="secondary">Zugang entziehen</button></form><?php else: ?><small>Eigener Zugang</small><?php endif ?></div><?php endforeach ?>
