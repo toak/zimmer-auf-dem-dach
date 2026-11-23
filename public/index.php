@@ -49,7 +49,7 @@ beginPage('Zimmer auf dem Dach',$error);
 <p class="stat"><svg width="12" height="12" aria-hidden="true"><rect width="12" height="12" fill="#183e70"/></svg> <?=eur($received)?> eingegangen ·
 <svg width="12" height="12" aria-hidden="true"><rect width="12" height="12" fill="#e7ab24"/></svg> <?=eur($sum)?> zugesagt</p>
 <?php if ($stand['as_of']): ?><p><small>Kontostand vom <?=dateAT($stand['as_of'])?></small></p><?php endif ?>
-<p><strong>Spenden bald steuerlich absetzbar!</strong> Wenn du darauf warten möchtest, kannst du das bei deiner Zusage angeben.</p>
+<p><strong>Spenden bald steuerlich absetzbar!</strong> Mit einer Zusage wird dein Beitrag gleich hier angezeigt.</p>
 <div class="actions"><a id="open-pledge" class="button" href="/?zusage=1#pledge">Spende zusagen</a><a class="button secondary" href="#konto">Jetzt überweisen</a></div></article>
 <dialog id="pledge" aria-labelledby="formtitle" <?=($error || isset($_GET['zusage']))?'open':''?>><form method="post" action="/"><?=csrf()?><input type="hidden" name="offer" value="<?=e($_SESSION['offer'])?>"><h2 id="formtitle">Spende zusagen</h2>
 <label>Betrag in Euro<input name="amount" inputmode="decimal" required value="<?=e(field('amount'))?>"></label>
