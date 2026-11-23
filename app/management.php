@@ -60,6 +60,27 @@ function changeBalance(): string {
     recordSnapshot($date,$c);
     return 'Der Gesamtstand wurde aktualisiert.';
 }
+function sendAdminInvitation(string $email): void {
+    global $config;
+    $url = rtrim($config['url'], '/').'/admin/';
+    $body = <<<TEXT
+Hallo!
+
+Du bist zur Spendenverwaltung für das Projekt „Zimmer auf dem Dach“ der Adventistischen Privatschule Klagenfurt eingeladen. Dort kannst du den Spendenstand aktualisieren, Zusagen einsehen und Zahlungseingänge verbuchen.
+
+Öffne die Verwaltung über diesen Link:
+$url
+
+Gib dort deine E-Mail-Adresse $email ein und klicke auf „Code und Link anfordern“. Du bekommst eine zweite E-Mail. Klicke darin auf den Anmeldelink oder gib den sechsstelligen Code auf der Anmeldeseite ein. Beide gelten 15 Minuten.
+
+Danke für deine Unterstützung!
+TEXT;
+    if (!mail($email, 'Einladung zur Spendenverwaltung | Zimmer auf dem Dach', $body, [
+        'From' => $config['sender'], 'Content-Type' => 'text/plain; charset=UTF-8',
+    ])) {
+        throw new FormError('Die Einladungsmail konnte nicht versendet werden. Bitte versuche die Freischaltung erneut.');
+    }
+}
 function handleAdmin(string $action): string {
     $admin=currentAdmin();
     if (!$admin) throw new FormError('Bitte melde dich erneut an.');
@@ -70,7 +91,8 @@ function handleAdmin(string $action): string {
         if ($action==='add') {
             if (query('SELECT email FROM admins WHERE email=?',[$email])->fetchColumn()) return 'Diese Adresse ist bereits freigeschaltet.';
             query('INSERT INTO admins(email,identity_key) VALUES (?,?)',[$email,bin2hex(random_bytes(32))]);
-            return 'Der Zugang ist freigeschaltet.';
+            sendAdminInvitation($email);
+            return 'Der Zugang ist freigeschaltet. Die Einladungsmail wurde an den Maildienst übergeben.';
         }
         if ($email===$admin['email']) throw new FormError('Der eigene Zugang muss aktiv bleiben.');
         query('DELETE FROM admins WHERE email=?',[$email]);
