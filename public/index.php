@@ -28,7 +28,7 @@ $receivedWidth = min($goal, $received);
 $pledgedWidth = min($sum, $goal - $receivedWidth);
 beginPage('Zimmer auf dem Dach',$error);
 ?>
-<section class="hero"><div><small>Ganztagsschule Klagenfurt</small><h1>Ein Zimmer auf dem Dach</h1>
+<section class="hero"><div><h1>Ein Zimmer auf dem Dach</h1>
 <p>Unsere Adventistische Privatschule in Klagenfurt wächst – und mit ihr der Bedarf an Platz.</p>
 <p>Wie die Sunamitin dem Propheten ein Zimmer auf dem Dach baute, möchten wir Raum schaffen für das, was wirklich zählt: Glaube, Bildung und Zukunft.</p>
 <p>Ein neuer Klassenraum bedeutet:</p>
