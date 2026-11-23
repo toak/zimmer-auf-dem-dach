@@ -1,0 +1,7 @@
+/env.php
+/config.php
+/.env*
+*.log
+*.sql.gz
+*.sqlite*
+.DS_Store
