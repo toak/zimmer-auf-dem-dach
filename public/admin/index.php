@@ -31,7 +31,13 @@ if (!$admin): ?>
 <label>Sechsstelliger Code<input name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required></label><button>Anmelden</button></form></details><?php endif ?>
 <?php else:
 $state=query('SELECT * FROM campaign WHERE id=1')->fetch(); ?>
-<h1>Verwaltung</h1><div class="actions"><a href="/">Zur Spendenseite</a><form method="post"><?=formFields('logout')?><button class="secondary">Abmelden</button></form></div>
+<div class="admin-heading">
+  <h1>Verwaltung</h1>
+  <div class="actions admin-heading-actions">
+    <a class="button" href="/">Zur Spendenseite</a>
+    <form method="post"><?=formFields('logout')?><button class="secondary" type="submit">Abmelden</button></form>
+  </div>
+</div>
 <div class="tabs" aria-label="Bereiche der Verwaltung"><a href="#spenden">Spenden</a><a href="#zusagen">Zusagen</a><a href="#zugriff">Admin Zugriff</a></div>
 <script src="/assets/admin.js" defer></script><article id="spenden"><h2>Spendenstand</h2><p class="stat"><?=$state['as_of']?eur((int)$state['cents']).' · '.dateAT($state['as_of']):'Erster Kontostand ausständig'?></p>
 <form method="post"><?=formFields('balance')?><input type="hidden" name="version" value="<?=e($state['version_no'])?>">
