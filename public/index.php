@@ -28,7 +28,17 @@ $receivedWidth = min($goal, $received);
 $pledgedWidth = min($sum, $goal - $receivedWidth);
 beginPage('Zimmer auf dem Dach',$error);
 ?>
-<section class="hero"><div><small>Ganztagsschule Klagenfurt</small><h1>Zimmer auf dem Dach</h1><p>Auf dem Dach unserer Schule haben die Kinder rund 43 m² mehr Platz zum Lernen, Spielen und Zusammensein. Hilf uns, die Finanzierung dieses Raums abzuschließen.</p></div><img src="/assets/dachzimmer-planung.jpg" alt="3D-Ansicht des geplanten Dachzimmers mit Fensterfront und Gruppentischen"></section>
+<section class="hero"><div><small>Ganztagsschule Klagenfurt</small><h1>Ein Zimmer auf dem Dach</h1>
+<p>Unsere Adventistische Privatschule in Klagenfurt wächst – und mit ihr der Bedarf an Platz.</p>
+<p>Wie die Sunamitin dem Propheten ein Zimmer auf dem Dach baute, möchten wir Raum schaffen für das, was wirklich zählt: Glaube, Bildung und Zukunft.</p>
+<p>Ein neuer Klassenraum bedeutet:</p>
+<ul>
+  <li>mehr Platz zum Lernen</li>
+  <li>mehr Ruhe und Konzentration</li>
+  <li>mehr Platz für die Nachmittagsbetreuung (GTS)</li>
+</ul>
+<p>Gemeinsam schaffen wir einen Ort, an dem Kinder lernen, glauben und wachsen können.</p>
+<p><strong>Deine Spende macht den Unterschied!</strong></p></div><img src="/assets/dachzimmer-planung.jpg" alt="3D-Ansicht des geplanten Dachzimmers mit Fensterfront und Gruppentischen"></section>
 <article><small>Unser Spendenziel · <?=eur($goal)?></small>
 <h2><?=eur($received + $sum)?> inklusive Zusagen</h2>
 <svg width="100%" height="18" viewBox="0 0 <?=$goal?> 18" preserveAspectRatio="none" role="img" aria-label="<?=eur($received)?> eingegangen und <?=eur($sum)?> zugesagt bei einem Ziel von <?=eur($goal)?>">
