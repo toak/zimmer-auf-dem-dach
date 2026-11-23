@@ -8,7 +8,6 @@ function beginPage(string $title, string $error=''): void { ?>
 <span class="sizes" aria-label="Schriftgröße"><?php foreach(['normal','groß','größer'] as $i=>$size): ?><button type="button" aria-label="Schriftgröße <?=e($size)?>" data-size="<?=$i?>">A</button><?php endforeach ?></span></div>
 <nav class="school-menu" aria-label="Schulwebsite"><?php schoolMenu(); ?></nav>
 <details class="mobile-menu"><summary>Menu</summary><div><?php schoolMenu(); ?><a href="<?=SCHOOL?>/kontakt/">Kontakt</a><a href="<?=SCHOOL?>/suche/">Suche</a></div></details></header>
-<?php if($title==='Zimmer auf dem Dach'): ?><img class="school-banner" src="<?=SCHOOL?>/media_content/images_carousel/banner_6_1570010907.jpg" alt="… weil du wertvoll bist!"><?php endif ?>
 <main><?php if ($error): ?><p class="notice error" role="alert"><?=e($error)?></p><?php endif;
 if (isset($_SESSION['notice'])): ?><p class="notice" role="status"><?=e($_SESSION['notice'])?></p><?php unset($_SESSION['notice']); endif;
 }
