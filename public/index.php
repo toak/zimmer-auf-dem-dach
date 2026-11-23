@@ -43,5 +43,5 @@ beginPage('Zimmer auf dem Dach',$error);
 ] as [$title,$slug,$image]): ?>
 <a class="report" href="<?=SCHOOL?>/blog/<?=e($slug)?>/"><img loading="lazy" src="<?=SCHOOL?>/media_blog/images/<?=e($image)?>" alt=""><h3><?=e($title)?></h3></a>
 <?php endforeach ?></div></section>
-<article id="konto"><img src="/assets/ueberweisung.png" alt="Spenden-QR-Code zum Scannen mit deiner Banking-App"><h2>Spendenkonto</h2><p>Scanne den QR-Code mit deiner Banking-App oder kopiere die IBAN. Den Betrag wählst du selbst.</p><p>Schulverein der Siebenten-Tags-Adventisten<br><strong>AT65 3219 5000 0021 5897</strong><br>BIC RLNWATWWASP</p><p>Verwendungszweck <strong>zimmer auf dem dach</strong></p><button class="secondary" id="copy-iban" hidden>IBAN kopieren</button></article>
+<article id="konto"><img src="/assets/ueberweisung.png" alt="Spenden-QR-Code zum Scannen mit deiner Banking-App"><h2>Spendenkonto</h2><p>Scanne den QR-Code mit deiner Banking-App oder kopiere die IBAN. Den Betrag wählst du selbst.</p><p>Schulverein der Siebenten-Tags-Adventisten<br>IBAN: <strong>AT65 3219 5000 0021 5897</strong><br>BIC: RLNWATWWASP</p><p>Verwendungszweck: <strong>zimmer auf dem dach</strong></p><button class="secondary" id="copy-iban" hidden>IBAN kopieren</button></article>
 <?php endPage(); ?>
