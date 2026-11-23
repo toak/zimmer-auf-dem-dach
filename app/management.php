@@ -1,24 +1,42 @@
 <?php
+function loginCode(string $tokenHash): string {
+    global $config;
+    $digest=hash_hmac('sha256','admin-otp:'.$tokenHash,$config['rate_secret']);
+    return sprintf('%06d',hexdec(substr($digest,0,8)) % 1000000);
+}
 function requestLink(): void {
     global $config;
     limitRequests('login',20);
     $email=strtolower(field('email'));
     $token=bin2hex(random_bytes(32));
+    $_SESSION['login_email']=$email;
     $now=time();
     $updated=query('UPDATE admins SET token_hash=?,expires_at=?,issued_at=? WHERE email=? AND (issued_at IS NULL OR issued_at<=?)',
         [hash('sha256',$token),$now+900,$now,$email,$now-90])->rowCount();
     if ($updated) {
         $url=rtrim($config['url'],'/').'/admin/?token='.$token;
-        $body="Mit diesem Link kannst du dich innerhalb von 15 Minuten anmelden:\n\n".$url;
-        $sent=mail($email,'Dein Anmeldelink | Zimmer auf dem Dach',$body,[
+        $code=loginCode(hash('sha256',$token));
+        $body="Dein Einmalcode: ".$code."\n\nGib den Code unter Verwaltung ein oder öffne den folgenden Link. Beide gelten 15 Minuten und können zusammen nur einmal verwendet werden:\n\n".$url;
+        $sent=mail($email,'Dein Einmalcode und Anmeldelink | Zimmer auf dem Dach',$body,[
             'From'=>$config['sender'],'Content-Type'=>'text/plain; charset=UTF-8',
         ]);
         if (!$sent) error_log('GTS: Anmeldemail konnte nicht an den Maildienst übergeben werden.');
     }
-    redirect('/admin/','Wenn deine Adresse freigeschaltet ist, bekommst du einen Anmeldelink. Schau bitte auch in deinen Spamordner.');
+    redirect('/admin/','Wenn deine Adresse freigeschaltet ist, bekommst du einen Einmalcode und einen Anmeldelink. Schau bitte auch in deinen Spamordner.');
 }
-function redeemLink(): void {
-    $hash=$_SESSION['pending']??'';
+function redeemCode(): void {
+    $email=strtolower(field('email'));
+    $code=field('code');
+    if (!validEmail($email) || !preg_match('/^[0-9]{6}$/D',$code)) throw new FormError('Bitte gib deine E-Mail-Adresse und den sechsstelligen Code ein.');
+    limitRequests('otp-ip',20);
+    limitRequests('otp-account',8,$email);
+    $row=query('SELECT token_hash FROM admins WHERE email=? AND expires_at>?',[$email,time()])->fetch();
+    if (!$row || !$row['token_hash'] || !hash_equals(loginCode($row['token_hash']),$code))
+        throw new FormError('Der Code ist ungültig oder abgelaufen.');
+    redeemLink($row['token_hash']);
+}
+function redeemLink(?string $codeHash=null): void {
+    $hash=$codeHash??$_SESSION['pending']??'';
     $admin=transaction(function() use($hash) {
         $key=query('SELECT identity_key FROM admins WHERE token_hash=? AND expires_at>?',[$hash,time()])->fetchColumn();
         if (!$key) throw new FormError('Dieser Anmeldelink ist abgelaufen oder bereits verwendet. Bitte einen neuen Link anfordern.');

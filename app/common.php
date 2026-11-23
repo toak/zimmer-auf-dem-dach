@@ -16,7 +16,7 @@ $db = new PDO($config['dsn'], $config['user'], $config['password'], [
 header('Cache-Control: no-store');
 header('Referrer-Policy: no-referrer');
 header('X-Content-Type-Options: nosniff');
-header("Content-Security-Policy: default-src 'self'; img-src 'self' https://www.privatschule-klagenfurt.at; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+header("Content-Security-Policy: default-src 'self'; img-src 'self' https://www.privatschule-klagenfurt.at; style-src 'self'; font-src 'self' https://www.privatschule-klagenfurt.at; script-src 'self'; form-action 'self' https://www.privatschule-klagenfurt.at; frame-ancestors 'none'; base-uri 'none'");
 ini_set('session.use_strict_mode','1');
 session_set_cookie_params(['secure'=>true,'httponly'=>true,'samesite'=>'Lax','path'=>'/']);
 session_start();
@@ -53,10 +53,10 @@ function transaction(callable $work): mixed {
         $result=$work(); $db->commit(); return $result;
     } catch(Throwable $e) { $db->rollBack(); throw $e; }
 }
-function limitRequests(string $kind,int $max): void {
+function limitRequests(string $kind,int $max, ?string $subject=null): void {
     global $config;
     $now=time();
-    $key=hash_hmac('sha256',$kind.'|'.($_SERVER['REMOTE_ADDR']??''),$config['rate_secret']);
+    $key=hash_hmac('sha256',$kind.'|'.($subject??($_SERVER['REMOTE_ADDR']??'')),$config['rate_secret']);
     transaction(function() use($key,$now,$max) {
         query('DELETE FROM request_limits WHERE starts_at <= ?',[$now-3600]);
         $hits=query('SELECT hits FROM request_limits WHERE bucket=?',[$key])->fetchColumn();

@@ -35,8 +35,13 @@ beginPage('Zimmer auf dem Dach',$error);
 <label><input type="checkbox" name="wait" value="1" <?=field('wait')?'checked':''?>> Ich möchte mit meiner Spende warten, bis sie steuerlich absetzbar ist. Bitte gebt mir dann persönlich Bescheid.</label>
 <p><small>Eine Zusage zählt 28 Tage. Wenn du auf die Spendenabsetzbarkeit wartest, bleibt sie ohne Frist offen. Die Schule verwendet deine Kontaktdaten für Rückfragen zu deiner Zusage. Öffentlich erscheint nur die Summe.</small></p>
 <div class="actions"><button>Spende zusagen</button><button type="button" class="secondary" id="close-pledge">Schließen</button></div></form></dialog>
-<section><h2>Vom ersten Holzbau zum Dachzimmer</h2><ul>
-<?php foreach(['Ein Zimmer auf dem Dach'=>'Ein-Zimmer-auf-dem-Dach/5588','Die Vision nimmt Raum an!'=>'Die-Vision-nimmt-Raum-an/5602','Teamwork – Der Weg eines Eimers'=>'Teamwork-Der-Weg-eines-Eimers/5622'] as $name=>$slug): ?><li><a href="<?=SCHOOL?>/blog/<?=$slug?>/"><?=e($name)?></a></li><?php endforeach ?>
-</ul></section>
+<section><h2>Vom ersten Holzbau zum Dachzimmer</h2><div class="reports">
+<?php foreach ([
+    ['Ein Zimmer auf dem Dach','Ein-Zimmer-auf-dem-Dach/5588','5588_index_square_1787769950_s500.jpg'],
+    ['Die Vision nimmt Raum an!','Die-Vision-nimmt-Raum-an/5602','5602_index_square_1789024333_s500.jpg'],
+    ['Teamwork – Der Weg eines Eimers','Teamwork-Der-Weg-eines-Eimers/5622','5622_index_square_1791404540_s500.jpg'],
+] as [$title,$slug,$image]): ?>
+<a class="report" href="<?=SCHOOL?>/blog/<?=e($slug)?>/"><img loading="lazy" src="<?=SCHOOL?>/media_blog/images/<?=e($image)?>" alt=""><h3><?=e($title)?></h3></a>
+<?php endforeach ?></div></section>
 <article id="konto"><img src="/assets/ueberweisung.png" alt="Spenden-QR-Code zum Scannen mit deiner Banking-App"><h2>Spendenkonto</h2><p>Scanne den QR-Code mit deiner Banking-App oder kopiere die IBAN. Den Betrag wählst du selbst.</p><p>Schulverein der Siebenten-Tags-Adventisten<br><strong>AT65 3219 5000 0021 5897</strong><br>BIC RLNWATWWASP</p><p>Verwendungszweck <strong>zimmer auf dem dach</strong></p><button class="secondary" id="copy-iban" hidden>IBAN kopieren</button></article>
 <?php endPage(); ?>

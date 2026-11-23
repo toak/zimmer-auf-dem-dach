@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         guard(); $action=field('action');
         if ($action==='request') requestLink();
         if ($action==='login') redeemLink();
+        if ($action==='code') redeemCode();
         if ($action==='logout') { $_SESSION=[]; session_destroy(); redirect('/admin/'); }
         $target=match($action){'receive','remind'=>'zusagen','add','revoke'=>'zugriff',default=>'spenden'};
         redirect('/admin/#'.$target,transaction(fn()=>handleAdmin($action)));
@@ -24,7 +25,10 @@ $admin=currentAdmin();
 if (!$admin): ?>
 <h1>Verwaltung</h1>
 <?php if(isset($_SESSION['pending'])): ?><article><h2>Anmeldung bestätigen</h2><form method="post"><?=formFields('login')?><button>Jetzt anmelden</button></form></article>
-<?php else: ?><article><h2>Mit E-Mail anmelden</h2><p>Gib deine freigeschaltete Adresse ein. Dein persönlicher Link ist 15 Minuten gültig.</p><form method="post"><?=formFields('request')?><label>E-Mail-Adresse<input type="email" name="email" autocomplete="email" required></label><button>Anmeldelink senden</button></form></article><?php endif ?>
+<?php else: ?><article><h2>Mit E-Mail anmelden</h2><p>Gib deine freigeschaltete Adresse ein. Du erhältst einen sechsstelligen Code und einen Anmeldelink. Wähle einen der beiden Wege.</p><form method="post"><?=formFields('request')?><label>E-Mail-Adresse<input type="email" name="email" autocomplete="email" required value="<?=e($_SESSION['login_email']??'')?>"></label><button>Code und Link anfordern</button></form></article>
+<details class="code-box" <?=isset($_SESSION['login_email']) || field('action')==='code'?'open':''?>><summary>Einmalcode eingeben</summary><form method="post"><?=formFields('code')?>
+<label>E-Mail-Adresse<input type="email" name="email" autocomplete="email" required value="<?=e($_SESSION['login_email']??field('email'))?>"></label>
+<label>Sechsstelliger Code<input name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required></label><button>Anmelden</button></form></details><?php endif ?>
 <?php else:
 $state=query('SELECT * FROM campaign WHERE id=1')->fetch(); ?>
 <h1>Verwaltung</h1><div class="actions"><a href="/">Zur Spendenseite</a><form method="post"><?=formFields('logout')?><button class="secondary">Abmelden</button></form></div>

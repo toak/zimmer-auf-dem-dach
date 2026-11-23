@@ -17,3 +17,8 @@ if (copy) {
     } catch { copy.textContent = 'Bitte die IBAN oben markieren und kopieren'; }
   });
 }
+for (const control of document.querySelectorAll('[data-size]')) {
+  control.addEventListener('click', () => {
+    document.documentElement.dataset.textSize = control.dataset.size;
+  });
+}
