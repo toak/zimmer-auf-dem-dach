@@ -28,7 +28,7 @@ $receivedWidth = min($goal, $received);
 $pledgedWidth = min($sum, $goal - $receivedWidth);
 beginPage('Zimmer auf dem Dach',$error);
 ?>
-<section class="hero"><div><small>Ganztagsschule Klagenfurt</small><h1>Zimmer auf dem Dach</h1><p>Auf dem Dach unserer Schule haben die Kinder rund 43 m² mehr Platz zum Lernen, Spielen und Zusammensein. Hilf uns, die Finanzierung dieses Raums abzuschließen.</p></div><img src="<?=SCHOOL?>/media_blog/images/5588_index_square_1787769950_s500.jpg" alt="Holzbau für das neue Dachzimmer während der Bauphase"></section>
+<section class="hero"><div><small>Ganztagsschule Klagenfurt</small><h1>Zimmer auf dem Dach</h1><p>Auf dem Dach unserer Schule haben die Kinder rund 43 m² mehr Platz zum Lernen, Spielen und Zusammensein. Hilf uns, die Finanzierung dieses Raums abzuschließen.</p></div><img src="/assets/dachzimmer-planung.jpg" alt="3D-Ansicht des geplanten Dachzimmers mit Fensterfront und Gruppentischen"></section>
 <article><small>Unser Spendenziel · <?=eur($goal)?></small>
 <h2><?=eur($received + $sum)?> inklusive Zusagen</h2>
 <svg width="100%" height="18" viewBox="0 0 <?=$goal?> 18" preserveAspectRatio="none" role="img" aria-label="<?=eur($received)?> eingegangen und <?=eur($sum)?> zugesagt bei einem Ziel von <?=eur($goal)?>">
