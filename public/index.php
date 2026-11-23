@@ -31,7 +31,6 @@ $destination = $_SERVER['HTTP_SEC_FETCH_DEST'] ?? '';
 $embedded = $destination === 'iframe' || ($destination === '' && ($_GET['embed'] ?? '') === '1');
 beginPage('Zimmer auf dem Dach',$error,$embedded);
 ?>
-<?php if (!$embedded): ?><p><a href="<?=SCHOOL?>/">← Zurück zur Website der Adventistischen Privatschule Klagenfurt</a></p><?php endif ?>
 <section class="hero"><div><h1>Ein Zimmer auf dem Dach</h1>
 <p>Unsere Adventistische Privatschule in Klagenfurt wächst – und mit ihr der Bedarf an Platz.</p>
 <p>Wie die Sunamitin dem Propheten ein Zimmer auf dem Dach baute, möchten wir Raum schaffen für das, was wirklich zählt: Glaube, Bildung und Zukunft.</p>
