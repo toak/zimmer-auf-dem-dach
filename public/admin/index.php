@@ -1,0 +1,56 @@
+<?php
+require dirname(__DIR__,2).'/app/common.php';
+require dirname(__DIR__,2).'/app/management.php';
+require dirname(__DIR__,2).'/app/layout.php';
+$error='';
+if (isset($_GET['token']) && is_string($_GET['token']) && preg_match('/^[a-f0-9]{64}$/D',$_GET['token'])) {
+    $_SESSION['pending']=hash('sha256',$_GET['token']); redirect('/admin/');
+}
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+    try {
+        guard(); $action=field('action');
+        if ($action==='request') requestLink();
+        if ($action==='login') redeemLink();
+        if ($action==='logout') { $_SESSION=[]; session_destroy(); redirect('/admin/'); }
+        $target=match($action){'receive','remind'=>'zusagen','add','revoke'=>'zugriff',default=>'spenden'};
+        redirect('/admin/#'.$target,transaction(fn()=>handleAdmin($action)));
+    } catch(FormError $ex) { $error=$ex->getMessage(); if (field('action')==='login') unset($_SESSION['pending']); }
+}
+beginPage('Verwaltung',$error);
+function formFields(string $action): string {
+    return csrf().'<input type="hidden" name="action" value="'.e($action).'">';
+}
+$admin=currentAdmin();
+if (!$admin): ?>
+<h1>Verwaltung</h1>
+<?php if(isset($_SESSION['pending'])): ?><article><h2>Anmeldung bestätigen</h2><form method="post"><?=formFields('login')?><button>Jetzt anmelden</button></form></article>
+<?php else: ?><article><h2>Mit E-Mail anmelden</h2><p>Gib deine freigeschaltete Adresse ein. Dein persönlicher Link ist 15 Minuten gültig.</p><form method="post"><?=formFields('request')?><label>E-Mail-Adresse<input type="email" name="email" autocomplete="email" required></label><button>Anmeldelink senden</button></form></article><?php endif ?>
+<?php else:
+$state=query('SELECT * FROM campaign WHERE id=1')->fetch(); ?>
+<h1>Verwaltung</h1><div class="actions"><a href="/">Zur Spendenseite</a><form method="post"><?=formFields('logout')?><button class="secondary">Abmelden</button></form></div>
+<div class="tabs" aria-label="Bereiche der Verwaltung"><a href="#spenden">Spenden</a><a href="#zusagen">Zusagen</a><a href="#zugriff">Admin Zugriff</a></div>
+<script src="/assets/admin.js" defer></script><article id="spenden"><h2>Spendenstand</h2><p class="stat"><?=$state['as_of']?eur((int)$state['cents']).' · '.dateAT($state['as_of']):'Erster Kontostand ausständig'?></p>
+<form method="post"><?=formFields('balance')?><input type="hidden" name="version" value="<?=e($state['version_no'])?>">
+<label>Gesamtbetrag laut Kontoauszug (€)<input name="amount" required inputmode="decimal"></label><label>Stichtag<input type="date" name="date" value="<?=date('Y-m-d')?>" max="<?=date('Y-m-d')?>" required></label><p><small>Der Betrag enthält alle bis zum Stichtag verbuchten Spenden. Bereits erfasste Eingänge nach dem Stichtag zählt die Seite dazu.</small></p><button>Gesamtstand übernehmen</button></form></article>
+<article id="zusagen"><h2>Spendenzusagen</h2><p>„Erinnert“ dokumentiert deine persönliche Kontaktaufnahme. „Eingegangen“ verbucht den zugesagten Betrag zum heutigen Datum.</p>
+<div class="filters"><label>Suche<input id="term" type="search" placeholder="Name oder Kontakt"></label><label>Status<select id="status"><option value="">Alle Zusagen</option><option>Offen</option><option>Wartet auf Absetzbarkeit</option><option>Abgelaufen</option><option>Eingegangen</option></select></label><label>Erinnerung<select id="reminder"><option value="">Alle</option><option value="0">Noch nicht erinnert</option><option value="1">Bereits erinnert</option></select></label></div>
+<p id="matches" aria-live="polite"></p>
+<table class="pledges"><thead><tr><th>Person</th><th>Betrag</th><th>Status</th><th>Zusage erhalten</th><th>Letzte Erinnerung</th><th>Zahlung eingegangen</th><th>Aktionen</th></tr></thead><tbody id="records">
+<?php $count=0; foreach(query('SELECT * FROM pledges ORDER BY CASE WHEN received_at IS NULL THEN 0 ELSE 1 END, created_at DESC,id') as $p): $count++; $received=$p['received_at']!==null; ?>
+<?php
+$status=$received?'Eingegangen':($p['wait_tax']?'Wartet auf Absetzbarkeit':(((int)$p['created_at']+28*86400<=time())?'Abgelaufen':'Offen'));
+$stamp=static fn($ts)=>$ts?date('d.m.Y · H:i',(int)$ts):'—';
+?>
+<tr data-status="<?=e($status)?>" data-reminded="<?=$p['reminded_at']?'1':'0'?>">
+<td data-label="Person"><strong><?=e($p['donor'])?></strong><small><?=e($p['contact'])?></small></td>
+<td data-label="Betrag"><?=eur((int)$p['cents'])?></td><td data-label="Status"><span class="badge"><?=e($status)?></span>
+<?php if(!$received): ?><small><?=$p['wait_tax']?'Ohne Frist':'Bis '.date('d.m.Y',(int)$p['created_at']+28*86400)?></small><?php endif ?></td>
+<td data-label="Zusage erhalten"><?=$stamp($p['created_at'])?></td>
+<td data-label="Letzte Erinnerung"><?=$stamp($p['reminded_at'])?></td>
+<td data-label="Zahlung eingegangen"><?=$stamp($p['received_at'])?></td><td data-label="Aktionen">
+<?php if(!$received): ?><form method="post" action="/admin/#zusagen"><?=csrf()?><input type="hidden" name="id" value="<?=e($p['id'])?>"><button class="secondary" name="action" value="remind">Erinnert</button><button name="action" value="receive">Eingegangen</button></form><?php endif ?></td></tr>
+<?php endforeach ?></tbody></table></article>
+<article id="zugriff"><h2>Benutzerverwaltung</h2><?php foreach(query('SELECT email FROM admins ORDER BY email') as $u): ?><div class="row"><?=e($u['email'])?>
+<?php if ($u['email']!==$admin['email']): ?><form method="post"><?=formFields('revoke')?><input type="hidden" name="email" value="<?=e($u['email'])?>"><button class="secondary">Zugang entziehen</button></form><?php else: ?><small>Eigener Zugang</small><?php endif ?></div><?php endforeach ?>
+<form method="post"><?=formFields('add')?><label>Weitere E-Mail-Adresse<input type="email" name="email" required></label><button>Freischalten</button></form></article>
+<?php endif; endPage(); ?>

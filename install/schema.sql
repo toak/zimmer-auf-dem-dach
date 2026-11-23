@@ -1,0 +1,16 @@
+CREATE TABLE campaign (
+ id INT PRIMARY KEY, cents BIGINT NOT NULL, as_of DATE NULL, version_no BIGINT NOT NULL, last_snapshot DATE NULL
+) ENGINE=InnoDB;
+INSERT INTO campaign VALUES (1,0,NULL,0,NULL);
+CREATE TABLE pledges (
+ id CHAR(32) PRIMARY KEY, donor VARCHAR(120) NOT NULL, contact VARCHAR(254) NOT NULL,
+ cents BIGINT NOT NULL, created_at BIGINT NOT NULL, wait_tax TINYINT NOT NULL,
+ reminded_at BIGINT NULL, received_at BIGINT NULL, INDEX(created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE admins (
+ email VARCHAR(254) PRIMARY KEY, identity_key CHAR(64) NOT NULL UNIQUE,
+ token_hash CHAR(64) UNIQUE, expires_at BIGINT NULL, issued_at BIGINT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE request_limits (
+ bucket CHAR(64) PRIMARY KEY, starts_at BIGINT NOT NULL, hits INT NOT NULL
+) ENGINE=InnoDB;

@@ -1,0 +1,42 @@
+<?php
+require dirname(__DIR__).'/app/common.php';
+require dirname(__DIR__).'/app/layout.php';
+$error='';
+$_SESSION['offer'] ??= bin2hex(random_bytes(16));
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+    try {
+        guard();
+        if (!hash_equals($_SESSION['offer'],field('offer'))) redirect('/');
+        $cents=amount(); $name=field('person'); $contact=field('contact');
+        if ($name==='' || mb_strlen($name)>120) throw new FormError('Bitte gib deinen Namen ein.');
+        if (!validEmail($contact) && !(preg_match('/^\+?[\d\s().\/-]{5,35}$/D',$contact) && strlen(preg_replace('/\D/','',$contact))>=6))
+            throw new FormError('Bitte gib deine E-Mail-Adresse oder Telefonnummer ein.');
+        if (field('website')!=='') throw new FormError('Die Zusage konnte nicht angenommen werden.');
+        limitRequests('offer',20);
+        query('INSERT INTO pledges (id, donor, contact, cents, created_at, wait_tax) VALUES (?,?,?,?,?,?)',[$_SESSION['offer'],$name,$contact,$cents,time(),field('wait')==='1'?1:0]);
+        unset($_SESSION['offer']);
+        redirect('/','Herzlichen Dank! Deine Spendenzusage wurde aufgenommen.');
+    } catch(FormError $ex) { $error=$ex->getMessage(); }
+}
+$stand=query('SELECT * FROM campaign WHERE id=1')->fetch();
+$sum=(int)query('SELECT COALESCE(SUM(cents),0) FROM pledges WHERE received_at IS NULL AND (wait_tax=1 OR created_at>?)',[time()-28*86400])->fetchColumn();
+beginPage('Zimmer auf dem Dach',$error);
+?>
+<section class="hero"><div><small>Ganztagsschule Klagenfurt</small><h1>Zimmer auf dem Dach</h1><p>Auf dem Dach unserer Schule haben die Kinder rund 43 m² mehr Platz zum Lernen, Spielen und Zusammensein. Hilf uns, die Finanzierung dieses Raums abzuschließen.</p></div><img src="<?=SCHOOL?>/media_blog/images/5588_index_square_1787769950_s500.jpg" alt="Holzbau für das neue Dachzimmer während der Bauphase"></section>
+<article><small>Unser Spendenziel · 40.000 €</small>
+<?php if ($stand['as_of']): ?><h2><?=eur((int)$stand['cents'])?> eingegangen</h2><progress max="4000000" value="<?=min(4000000,(int)$stand['cents'])?>" aria-label="Anteil des erreichten Spendenziels"></progress><p><small>Stand vom <?=dateAT($stand['as_of'])?></small></p>
+<?php else: ?><h2>Gemeinsam 40.000 € sammeln</h2><?php endif ?>
+<p class="stat"><b><?=eur($sum)?></b> zugesagt</p><div class="actions"><a id="open-pledge" class="button" href="/?zusage=1#pledge">Spende zusagen</a><a class="button secondary" href="#konto">Jetzt überweisen</a></div></article>
+<dialog id="pledge" aria-labelledby="formtitle" <?=($error || isset($_GET['zusage']))?'open':''?>><form method="post" action="/"><?=csrf()?><input type="hidden" name="offer" value="<?=e($_SESSION['offer'])?>"><h2 id="formtitle">Spende zusagen</h2>
+<label>Betrag in Euro<input name="amount" inputmode="decimal" required value="<?=e(field('amount'))?>"></label>
+<label>Name<input name="person" maxlength="120" autocomplete="name" required value="<?=e(field('person'))?>"></label>
+<label>E-Mail-Adresse oder Telefonnummer<input name="contact" maxlength="254" required value="<?=e(field('contact'))?>"></label>
+<label class="trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+<label><input type="checkbox" name="wait" value="1" <?=field('wait')?'checked':''?>> Ich möchte mit meiner Spende warten, bis sie steuerlich absetzbar ist. Bitte gebt mir dann persönlich Bescheid.</label>
+<p><small>Eine Zusage zählt 28 Tage. Wenn du auf die Spendenabsetzbarkeit wartest, bleibt sie ohne Frist offen. Die Schule verwendet deine Kontaktdaten für Rückfragen zu deiner Zusage. Öffentlich erscheint nur die Summe.</small></p>
+<div class="actions"><button>Spende zusagen</button><button type="button" class="secondary" id="close-pledge">Schließen</button></div></form></dialog>
+<section><h2>Vom ersten Holzbau zum Dachzimmer</h2><ul>
+<?php foreach(['Ein Zimmer auf dem Dach'=>'Ein-Zimmer-auf-dem-Dach/5588','Die Vision nimmt Raum an!'=>'Die-Vision-nimmt-Raum-an/5602','Teamwork – Der Weg eines Eimers'=>'Teamwork-Der-Weg-eines-Eimers/5622'] as $name=>$slug): ?><li><a href="<?=SCHOOL?>/blog/<?=$slug?>/"><?=e($name)?></a></li><?php endforeach ?>
+</ul></section>
+<article id="konto"><img src="/assets/ueberweisung.png" alt="Spenden-QR-Code zum Scannen mit deiner Banking-App"><h2>Spendenkonto</h2><p>Scanne den QR-Code mit deiner Banking-App oder kopiere die IBAN. Den Betrag wählst du selbst.</p><p>Schulverein der Siebenten-Tags-Adventisten<br><strong>AT65 3219 5000 0021 5897</strong><br>BIC RLNWATWWASP</p><p>Verwendungszweck <strong>zimmer auf dem dach</strong></p><button class="secondary" id="copy-iban" hidden>IBAN kopieren</button></article>
+<?php endPage(); ?>
