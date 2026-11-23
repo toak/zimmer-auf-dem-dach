@@ -57,4 +57,24 @@ beginPage('Zimmer auf dem Dach',$error);
 <a class="report" href="<?=SCHOOL?>/blog/<?=e($slug)?>/"><img loading="lazy" src="<?=SCHOOL?>/media_blog/images/<?=e($image)?>" alt=""><h3><?=e($title)?></h3></a>
 <?php endforeach ?></div></section>
 <article id="konto"><img src="/assets/ueberweisung.png" alt="Spenden-QR-Code zum Scannen mit deiner Banking-App"><h2>Spendenkonto</h2><p>Scanne den QR-Code mit deiner Banking-App oder kopiere die IBAN. Den Betrag wählst du selbst.</p><p>Schulverein der Siebenten-Tags-Adventisten<br>IBAN: <strong>AT65 3219 5000 0021 5897</strong><br>BIC: RLNWATWWASP</p><p>Verwendungszweck: <strong>zimmer auf dem dach</strong></p><button class="secondary" id="copy-iban" hidden>IBAN kopieren</button></article>
+<article id="teilen">
+  <h2>Spendenaktion teilen</h2>
+  <div class="share-layout">
+    <div>
+      <div class="actions">
+        <a class="button" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fapk.toak.de" target="_blank" rel="noopener noreferrer">Auf Facebook teilen</a>
+        <a class="button secondary" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram öffnen</a>
+      </div>
+      <p>Für Instagram kannst du den Link in einer Nachricht verschicken oder als Link-Sticker in deine Story einfügen.</p>
+      <div class="actions"><a id="share-url" href="https://apk.toak.de">https://apk.toak.de</a>
+        <button id="copy-share-url" class="secondary" type="button" hidden>Link kopieren</button><span id="share-status" role="status"></span>
+      </div>
+    </div>
+    <div class="share-qr">
+      <img src="/assets/spendenseite-qr.svg" width="160" height="160" alt="QR-Code zur Spendenseite">
+      <p>QR-Code für deine Präsentation</p>
+      <a href="/assets/spendenseite-qr.svg" download>SVG herunterladen</a> · <a href="/assets/spendenseite-qr.png" download>PNG herunterladen</a>
+    </div>
+  </div>
+</article>
 <?php endPage(); ?>

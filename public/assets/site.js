@@ -22,3 +22,17 @@ for (const control of document.querySelectorAll('[data-size]')) {
     document.documentElement.dataset.textSize = control.dataset.size;
   });
 }
+
+const copyShareUrl = document.querySelector('#copy-share-url');
+if (copyShareUrl && navigator.clipboard) {
+  copyShareUrl.hidden = false;
+  copyShareUrl.addEventListener('click', async () => {
+    const status = document.querySelector('#share-status');
+    try {
+      await navigator.clipboard.writeText(document.querySelector('#share-url').href.replace(/\/$/, ''));
+      status.textContent = 'Link kopiert.';
+    } catch {
+      status.textContent = 'Bitte kopiere den Link direkt.';
+    }
+  });
+}

@@ -55,3 +55,9 @@ html[data-text-size="1"]{font-size:112.5%}html[data-text-size="2"]{font-size:125
 .history-chart { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 0 10px; margin: 1.5rem 0; font-size: .85rem; }
 .history-scale { display: flex; flex-direction: column; justify-content: space-between; text-align: right; }
 .history-dates { grid-column: 2; display: flex; justify-content: space-between; }
+
+.share-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 24px; align-items: center; }
+.share-qr { text-align: center; }
+.share-qr img { display: block; margin: auto; }
+.share-qr p { margin: 0 0 .4rem; }
+@media (max-width: 680px) { .share-layout { grid-template-columns: 1fr; } }
