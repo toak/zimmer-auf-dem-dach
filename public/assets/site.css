@@ -61,3 +61,4 @@ html[data-text-size="1"]{font-size:112.5%}html[data-text-size="2"]{font-size:125
 .share-qr img { display: block; margin: auto; }
 .share-qr p { margin: 0 0 .4rem; }
 @media (max-width: 680px) { .share-layout { grid-template-columns: 1fr; } }
+@media (max-width: 680px) { .share-qr img { display: none; } }
