@@ -2,6 +2,8 @@
 require dirname(__DIR__,2).'/app/common.php';
 require dirname(__DIR__,2).'/app/management.php';
 require dirname(__DIR__,2).'/app/layout.php';
+require dirname(__DIR__,2).'/app/history.php';
+if (currentAdmin()) prepareHistory();
 $error='';
 if (isset($_GET['token']) && is_string($_GET['token']) && preg_match('/^[a-f0-9]{64}$/D',$_GET['token'])) {
     $_SESSION['pending']=hash('sha256',$_GET['token']); redirect('/admin/');
@@ -38,10 +40,11 @@ $state=query('SELECT * FROM campaign WHERE id=1')->fetch(); ?>
     <form method="post"><?=formFields('logout')?><button class="secondary" type="submit">Abmelden</button></form>
   </div>
 </div>
-<div class="tabs" aria-label="Bereiche der Verwaltung"><a href="#spenden">Spenden</a><a href="#zusagen">Zusagen</a><a href="#zugriff">Admin Zugriff</a></div>
+<div class="tabs" aria-label="Bereiche der Verwaltung"><a href="#spenden">Spenden</a><a href="#verlauf">Verlauf</a><a href="#zusagen">Zusagen</a><a href="#zugriff">Admin Zugriff</a></div>
 <script src="/assets/admin.js" defer></script><article id="spenden"><h2>Spendenstand</h2><p class="stat"><?=$state['as_of']?eur((int)$state['cents']).' · '.dateAT($state['as_of']):'Erster Kontostand ausständig'?></p>
 <form method="post"><?=formFields('balance')?><input type="hidden" name="version" value="<?=e($state['version_no'])?>">
 <label>Gesamtbetrag laut Kontoauszug (€)<input name="amount" required inputmode="decimal"></label><label>Stichtag<input type="date" name="date" value="<?=date('Y-m-d')?>" max="<?=date('Y-m-d')?>" required></label><p><small>Der Betrag enthält alle bis zum Stichtag verbuchten Spenden. Bereits erfasste Eingänge nach dem Stichtag zählt die Seite dazu.</small></p><button>Gesamtstand übernehmen</button></form></article>
+<article id="verlauf"><h2>Spendenverlauf</h2><?php showHistory(dailyBalances()); ?></article>
 <article id="zusagen"><h2>Spendenzusagen</h2><p>„Erinnert“ dokumentiert deine persönliche Kontaktaufnahme. „Eingegangen“ verbucht den zugesagten Betrag zum heutigen Datum.</p>
 <div class="filters"><label>Suche<input id="term" type="search" placeholder="Name oder Kontakt"></label><label>Status<select id="status"><option value="">Alle Zusagen</option><option>Offen</option><option>Wartet auf Absetzbarkeit</option><option>Abgelaufen</option><option>Eingegangen</option></select></label><label>Erinnerung<select id="reminder"><option value="">Alle</option><option value="0">Noch nicht erinnert</option><option value="1">Bereits erinnert</option></select></label></div>
 <p id="matches" aria-live="polite"></p>

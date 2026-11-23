@@ -57,6 +57,7 @@ function changeBalance(): string {
     $later=query('SELECT COALESCE(SUM(cents),0) AS total,MAX(received_at) AS latest FROM pledges WHERE received_at>=?',[$valid->modify('+1 day')->getTimestamp()])->fetch();
     $asOf=$later['latest'] ? date('Y-m-d',(int)$later['latest']) : $date;
     query('UPDATE campaign SET cents=?,as_of=?,last_snapshot=?,version_no=version_no+1 WHERE id=1',[$c+(int)$later['total'],$asOf,$date]);
+    recordSnapshot($date,$c);
     return 'Der Gesamtstand wurde aktualisiert.';
 }
 function handleAdmin(string $action): string {
