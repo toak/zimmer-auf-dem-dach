@@ -18,15 +18,28 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         redirect('/','Herzlichen Dank! Deine Spendenzusage wurde aufgenommen.');
     } catch(FormError $ex) { $error=$ex->getMessage(); }
 }
-$stand=query('SELECT * FROM campaign WHERE id=1')->fetch();
-$sum=(int)query('SELECT COALESCE(SUM(cents),0) FROM pledges WHERE received_at IS NULL AND (wait_tax=1 OR created_at>?)',[time()-28*86400])->fetchColumn();
+$goal = 4000000; // Cent
+$stand = query('SELECT cents, as_of, (SELECT COALESCE(SUM(cents),0) FROM pledges
+    WHERE received_at IS NULL AND (wait_tax=1 OR created_at>?)) AS pledged
+    FROM campaign WHERE id=1', [time()-28*86400])->fetch();
+$received = (int)$stand['cents'];
+$sum = (int)$stand['pledged'];
+$receivedWidth = min($goal, $received);
+$pledgedWidth = min($sum, $goal - $receivedWidth);
 beginPage('Zimmer auf dem Dach',$error);
 ?>
 <section class="hero"><div><small>Ganztagsschule Klagenfurt</small><h1>Zimmer auf dem Dach</h1><p>Auf dem Dach unserer Schule haben die Kinder rund 43 m² mehr Platz zum Lernen, Spielen und Zusammensein. Hilf uns, die Finanzierung dieses Raums abzuschließen.</p></div><img src="<?=SCHOOL?>/media_blog/images/5588_index_square_1787769950_s500.jpg" alt="Holzbau für das neue Dachzimmer während der Bauphase"></section>
-<article><small>Unser Spendenziel · 40.000 €</small>
-<?php if ($stand['as_of']): ?><h2><?=eur((int)$stand['cents'])?> eingegangen</h2><progress max="4000000" value="<?=min(4000000,(int)$stand['cents'])?>" aria-label="Anteil des erreichten Spendenziels"></progress><p><small>Stand vom <?=dateAT($stand['as_of'])?></small></p>
-<?php else: ?><h2>Gemeinsam 40.000 € sammeln</h2><?php endif ?>
-<p class="stat"><b><?=eur($sum)?></b> zugesagt</p><div class="actions"><a id="open-pledge" class="button" href="/?zusage=1#pledge">Spende zusagen</a><a class="button secondary" href="#konto">Jetzt überweisen</a></div></article>
+<article><small>Unser Spendenziel · <?=eur($goal)?></small>
+<h2><?=eur($received + $sum)?> inklusive Zusagen</h2>
+<svg width="100%" height="18" viewBox="0 0 <?=$goal?> 18" preserveAspectRatio="none" role="img" aria-label="<?=eur($received)?> eingegangen und <?=eur($sum)?> zugesagt bei einem Ziel von <?=eur($goal)?>">
+  <rect width="<?=$goal?>" height="18" fill="#e9edf1"/>
+  <rect width="<?=$receivedWidth?>" height="18" fill="#183e70"/>
+  <rect x="<?=$receivedWidth?>" width="<?=$pledgedWidth?>" height="18" fill="#e7ab24"/>
+</svg>
+<p class="stat"><svg width="12" height="12" aria-hidden="true"><rect width="12" height="12" fill="#183e70"/></svg> <?=eur($received)?> eingegangen ·
+<svg width="12" height="12" aria-hidden="true"><rect width="12" height="12" fill="#e7ab24"/></svg> <?=eur($sum)?> zugesagt</p>
+<?php if ($stand['as_of']): ?><p><small>Kontostand vom <?=dateAT($stand['as_of'])?></small></p><?php endif ?>
+<div class="actions"><a id="open-pledge" class="button" href="/?zusage=1#pledge">Spende zusagen</a><a class="button secondary" href="#konto">Jetzt überweisen</a></div></article>
 <dialog id="pledge" aria-labelledby="formtitle" <?=($error || isset($_GET['zusage']))?'open':''?>><form method="post" action="/"><?=csrf()?><input type="hidden" name="offer" value="<?=e($_SESSION['offer'])?>"><h2 id="formtitle">Spende zusagen</h2>
 <label>Betrag in Euro<input name="amount" inputmode="decimal" required value="<?=e(field('amount'))?>"></label>
 <label>Name<input name="person" maxlength="120" autocomplete="name" required value="<?=e(field('person'))?>"></label>
