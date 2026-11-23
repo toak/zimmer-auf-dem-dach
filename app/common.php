@@ -16,7 +16,8 @@ $db = new PDO($config['dsn'], $config['user'], $config['password'], [
 header('Cache-Control: no-store');
 header('Referrer-Policy: no-referrer');
 header('X-Content-Type-Options: nosniff');
-header("Content-Security-Policy: default-src 'self'; img-src 'self' https://www.privatschule-klagenfurt.at; style-src 'self'; font-src 'self' https://www.privatschule-klagenfurt.at; script-src 'self'; form-action 'self' https://www.privatschule-klagenfurt.at; frame-ancestors 'none'; base-uri 'none'");
+$frameAncestors = defined('PUBLIC_CAMPAIGN') ? 'https://www.privatschule-klagenfurt.at https://privatschule-klagenfurt.at' : "'none'";
+header("Content-Security-Policy: default-src 'self'; img-src 'self' https://www.privatschule-klagenfurt.at; style-src 'self'; font-src 'self' https://www.privatschule-klagenfurt.at; script-src 'self'; form-action 'self' https://www.privatschule-klagenfurt.at; frame-ancestors $frameAncestors; base-uri 'none'");
 ini_set('session.use_strict_mode','1');
 session_set_cookie_params(['secure'=>true,'httponly'=>true,'samesite'=>'Lax','path'=>'/']);
 session_start();
