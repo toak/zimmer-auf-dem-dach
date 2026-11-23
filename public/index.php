@@ -35,7 +35,7 @@ beginPage('Zimmer auf dem Dach',$error);
 <label><input type="checkbox" name="wait" value="1" <?=field('wait')?'checked':''?>> Ich möchte mit meiner Spende warten, bis sie steuerlich absetzbar ist. Bitte gebt mir dann persönlich Bescheid.</label>
 <p><small>Eine Zusage zählt 28 Tage. Wenn du auf die Spendenabsetzbarkeit wartest, bleibt sie ohne Frist offen. Die Schule verwendet deine Kontaktdaten für Rückfragen zu deiner Zusage. Öffentlich erscheint nur die Summe.</small></p>
 <div class="actions"><button>Spende zusagen</button><button type="button" class="secondary" id="close-pledge">Schließen</button></div></form></dialog>
-<section><h2>Vom ersten Holzbau zum Dachzimmer</h2><div class="reports">
+<section><h2>Vom Flachdach zum Zimmer - Blogartikel</h2><div class="reports">
 <?php foreach ([
     ['Ein Zimmer auf dem Dach','Ein-Zimmer-auf-dem-Dach/5588','5588_index_square_1787769950_s500.jpg'],
     ['Die Vision nimmt Raum an!','Die-Vision-nimmt-Raum-an/5602','5602_index_square_1789024333_s500.jpg'],
